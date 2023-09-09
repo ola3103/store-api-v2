@@ -1,9 +1,10 @@
 require("dotenv").config();
 require("express-async-errors");
-require("./connect/connectDB");
 
 const express = require("express");
 const app = express();
+
+const connectDB = require("./connect/connectDB");
 
 const productRouter = require("./routes/product-route");
 const notFoundMiddleware = require("./middleware/notFound-middleware");
@@ -17,4 +18,13 @@ app.use(errorHandlerMiddleware);
 
 const PORT = 9090;
 
-app.listen(PORT, () => console.log(`Server is listening on ${PORT}.....`));
+const start = async () => {
+  try {
+    await connectDB(process.env.URI);
+    app.listen(PORT, () => console.log(`Server is listening on ${PORT}.....`));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+start();

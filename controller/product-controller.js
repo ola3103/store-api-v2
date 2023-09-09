@@ -1,3 +1,4 @@
+const NotFoundError = require("../errors/notFound-error");
 const Product = require("../model/product");
 
 const createProduct = async (req, res) => {
@@ -5,18 +6,40 @@ const createProduct = async (req, res) => {
   res.status(200).json({ product });
 };
 const getAllProduct = async (req, res) => {
-  const product = await Product.find({});
+  const products = await Product.find({});
 
-  res.status(200).json({ product });
+  res
+    .status(200)
+    .json({ status: "success", result: products.length, data: products });
 };
 const singleProduct = async (req, res) => {
-  res.status(200).json({ msg: "Single Product" });
+  const { id } = req.params;
+
+  const product = await Product.findOne({ _id: id });
+  if (!product) {
+    throw new NotFoundError("Product not found");
+  }
+  res.status(200).json({ status: "success", data: product });
 };
 const updateProduct = async (req, res) => {
-  res.status(200).json({ msg: "Update Product" });
+  const { id } = req.params;
+
+  const product = await Product.findOneAndUpdate({ _id: id }, req.body, {
+    new: true,
+  });
+  if (!product) {
+    throw new NotFoundError("Product not found");
+  }
+  res.status(200).json({ status: "success", data: product });
 };
 const deleteProduct = async (req, res) => {
-  res.status(200).json({ msg: "Delete Product" });
+  const { id } = req.params;
+
+  const product = await Product.deleteOne({ _id: id });
+  if (!product) {
+    throw new NotFoundError("Product not found");
+  }
+  res.status(204).json({ status: "success", data: null });
 };
 
 module.exports = {
